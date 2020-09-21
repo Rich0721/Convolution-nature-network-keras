@@ -14,5 +14,6 @@
 <p><a href="https://arxiv.org/abs/1409.1556">Very Deep Convolutional Networks for Large-Scale Image Recognition</a></p>
 <p><a href="https://arxiv.org/abs/1512.03385">Deep Residual Learning for Image Recognition</a></p>
 <p><a href="https://arxiv.org/abs/1704.04861">MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications</a></p> 
+<p><a href="https://arxiv.org/abs/1801.04381">MobileNetV2: Inverted Residuals and Linear Bottlenecks</a></p> 
 <p><a href="https://arxiv.org/abs/1911.11929">CSPNet: A New Backbone that can Enhance Learning Capability of CNN</a></p> 
 </div>
