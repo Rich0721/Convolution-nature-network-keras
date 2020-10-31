@@ -5,19 +5,19 @@ Datetime: 2020/06/24
 import os
 
 import tensorflow as tf
-from tensorflow.python.keras.models import Model
-from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
-from tensorflow.python.keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
-from tensorflow.python.keras.engine import get_source_inputs
-from tensorflow.python.keras.utils import get_file, layer_utils
-from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.python.keras.optimizers import SGD 
+from keras.models import Model
+from keras import backend as K
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
+from keras.callbacks import ModelCheckpoint, Callback, EarlyStopping
+from keras.engine import get_source_inputs
+from keras.utils import get_file, layer_utils
+from keras.preprocessing.image import ImageDataGenerator
+from keras.optimizers import SGD 
 
 from net.vgg import VGG16, VGG19
 from net.cspresnet import cspresnet50
 from net.resnet import resnet50
-from net.resnet_sp import resnetsp50
+from net.resnext import resnext50
 
 class Train(object):
 
@@ -32,8 +32,8 @@ class Train(object):
         self._weights_file = weights_file
         self._storage_file = storage_file
         
-        self._checkpoint = ModelCheckpoint(storage_file, monitor='val_acc', verbose=1, save_best_only=True)
-        self._monitor = EarlyStopping(monitor='val_loss', min_delta=min_delta, patience=patience, verbose=1, mode='auto', restore_best_weights=True)
+        self._checkpoint = ModelCheckpoint(storage_file, monitor='val_acc', verbose=1, save_best_only=True, save_weights_only=False, period=1)
+        #self._monitor = EarlyStopping(monitor='val_loss', min_delta=min_delta, patience=patience, verbose=1, mode='auto', restore_best_weights=True)
 
     def _dataGenerator(self, train_folder, vali_folder):
 
@@ -86,7 +86,8 @@ class Train(object):
 
         steps_per_epoch =  self._train_genrator.n // self._batch_size
         validation_steps =  self._vali_generator.n // self._batch_size
-        callbacks =[self._checkpoint, self._monitor]
+        #callbacks =[self._checkpoint, self._monitor]
+        callbacks =[self._checkpoint]
         
         train_model.fit_generator(
             self._train_genrator,
@@ -111,7 +112,8 @@ class Train(object):
 
         steps_per_epoch =  self._train_genrator.n // self._batch_size
         validation_steps =  self._vali_generator.n // self._batch_size
-        callbacks =[self._checkpoint, self._monitor]
+        #callbacks =[self._checkpoint, self._monitor]
+        callbacks =[self._checkpoint]
         
         train_model.fit_generator(
             self._train_genrator,
@@ -135,7 +137,8 @@ class Train(object):
         steps_per_epoch =  self._train_genrator.n // self._batch_size
         validation_steps =  self._vali_generator.n // self._batch_size
 
-        callbacks =[self._checkpoint, self._monitor]
+        #callbacks =[self._checkpoint, self._monitor]
+        callbacks =[self._checkpoint]
         
         train_model.fit_generator(
             self._train_genrator,
@@ -144,6 +147,7 @@ class Train(object):
             validation_data=self._vali_generator,
             validation_steps=validation_steps,
             callbacks=callbacks)
+
     def cspresnet(self, epochs=100):
 
         model = cspresnet50(include_top=False, input_shape=(self._height, self._width, 3))
@@ -158,7 +162,8 @@ class Train(object):
         steps_per_epoch =  self._train_genrator.n // self._batch_size
         validation_steps =  self._vali_generator.n // self._batch_size
 
-        callbacks =[self._checkpoint, self._monitor]
+        #callbacks =[self._checkpoint, self._monitor]
+        callbacks =[self._checkpoint]
         
         train_model.fit_generator(
             self._train_genrator,
@@ -168,12 +173,12 @@ class Train(object):
             validation_steps=validation_steps,
             callbacks=callbacks)
 
-    def resnetsp(self, epochs=100):
+    def resnext(self, epochs=100):
 
-        model = resnetsp50(include_top=False, input_shape=(self._height, self._width, 3))
+        model = resnext50(include_top=False, input_shape=(self._height, self._width, 3))
         last_layer = model.get_layer("pool5").output
-        x = Flatten(name='flatten')(last_layer)
-        out = Dense(self._nb_classes, activation='softmax', name='fc8')(x)
+        x = Flatten(name="flatten")(last_layer)
+        out = Dense(self._nb_classes, activation='softmax', name='fc6')(x)
         train_model = Model(model.input, out)
         train_model.compile(loss='categorical_crossentropy',
                             optimizer=SGD(lr=1e-4, momentum=0.9),
@@ -182,7 +187,8 @@ class Train(object):
         steps_per_epoch =  self._train_genrator.n // self._batch_size
         validation_steps =  self._vali_generator.n // self._batch_size
 
-        callbacks =[self._checkpoint, self._monitor]
+        #callbacks =[self._checkpoint, self._monitor]
+        callbacks =[self._checkpoint]
         
         train_model.fit_generator(
             self._train_genrator,
@@ -195,16 +201,5 @@ class Train(object):
 
 if __name__ == "__main__":
     
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
-    sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-    K.set_session(sess)
-    train = Train(train_folder="./pattern/train", vali_folder="./pattern/veri", weights_file=None, storage_file="./models/resnetsp_2.hdf5")
-    train.resnetsp()
-    '''
-    K.clear_session()
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
-    sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-    K.set_session(sess)
-    train = Train(train_folder="./pattern/train", vali_folder="./pattern/veri", weights_file=None, storage_file="./models/resnet.hdf5")
+    train = Train(train_folder="./MASK/train", vali_folder="./MASK/vali", weights_file=None, storage_file="./models/resnet50.hdf5")
     train.resnet()
-    '''

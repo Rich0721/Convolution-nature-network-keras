@@ -6,8 +6,8 @@ import numpy as np
 from glob import glob
 
 import tensorflow as tf
-from tensorflow.python.keras.models import load_model
-from tensorflow.python.keras import backend as K
+from keras.models import load_model
+from keras import backend as K
 
 
 import matplotlib.pyplot as plt
@@ -40,6 +40,7 @@ class Test(object):
             for image in images:
 
                 img = cv2.imread(image)
+                img = cv2.resize(img, (224, 224))
                 img = img[:, :, [2, 1, 0]]
                 img = img / 255
                 img = np.expand_dims(img, axis=0)
@@ -50,7 +51,7 @@ class Test(object):
                 max_index = list_predict.index(max(list_predict))
                 self._confusion_matrix[self._nb_classes.index(p)][max_index] += 1
 
-                #print("{}:{}".format(p, self._nb_classes[max_index]))
+                print("{}:{}".format(p, self._nb_classes[max_index]))
                 if self._nb_classes[max_index] == p:
                     acc += 1
                     all_acc += 1
@@ -92,8 +93,9 @@ class Test(object):
 if __name__ == "__main__":
     K.clear_session()
     
-    test = Test(test_folder="./Original/test", model_file='./models/vgg19_ori.hdf5')
-    print("VGG19_ori")
+    test = Test(test_folder="../datasets/crop/test", model_file='./models/resnet50.hdf5')
+    
     test.verification()
-    test.confusionMatrix(title="vgg19_ori")
-    accuracy['VGG19_ori']  = test.printResult()
+    
+    test.confusionMatrix(title="resnet")
+    accuracy['resnet']  = test.printResult()

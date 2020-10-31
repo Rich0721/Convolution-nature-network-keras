@@ -5,22 +5,24 @@ Author: Rich, wu
 import os
 
 import tensorflow as tf
-from tensorflow.python.keras.models import Model
-from tensorflow.python.keras.layers import Input, BatchNormalization, Reshape
-from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
-from tensorflow.python.keras.layers import GlobalAveragePooling2D, AveragePooling2D, GlobalMaxPooling2D
-from tensorflow.python.keras.engine import get_source_inputs
-from tensorflow.python.keras.utils import get_file, layer_utils
+from keras.models import Model
+from keras.layers import Input, BatchNormalization, Reshape
+from keras import backend as K
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
+from keras.layers import GlobalAveragePooling2D, AveragePooling2D, GlobalMaxPooling2D
+from keras.engine import get_source_inputs
+from keras.utils import get_file, layer_utils
 from keras_applications.imagenet_utils import _obtain_input_shape
 
 import warnings
 
-VGG16_WEIGHTS_PATH = 'https://github.com/rcmalli/keras-vggface/releases/download/v2.0/rcmalli_vggface_tf_vgg16.h5'
-VGG16_WEIGHTS_PATH_NO_TOP = 'https://github.com/rcmalli/keras-vggface/releases/download/v2.0/rcmalli_vggface_tf_notop_vgg16.h5'
 
 
-def VGG16(include_top=True, weights='vggface', input_tensor=None, input_shape=None, pooling=None, classes=2622, weights_file=None):
+
+def VGG16(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000, weights_file=None):
+
+    VGG16_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_th_dim_ordering_th_kernels.h5'
+    VGG16_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_th_dim_ordering_th_kernels_notop.h5'
 
     input_shape = _obtain_input_shape(input_shape, default_size=224, min_size=48, data_format=K.image_data_format(), require_flatten=include_top)
     
@@ -81,15 +83,15 @@ def VGG16(include_top=True, weights='vggface', input_tensor=None, input_shape=No
     
     model = Model(inputs, x, name='vggFace_vgg16')
     model.summary()
-    if  weights == 'vggface':
+    if  weights == 'imagenet':
         if include_top:
-            weights_path = get_file('rcmalli_vggface_tf_vgg16.h5',
+            weights_path = get_file('vgg16_weights_th_dim_ordering_th_kernels.h5',
                                     VGG16_WEIGHTS_PATH,
                                     cache_subdir='./models')
         elif weights_file is not None:
             weights_path = weights_file
         else:
-            weights_path = get_file('rcmalli_vggface_tf_notop_vgg16.h5',
+            weights_path = get_file('vgg16_weights_th_dim_ordering_th_kernels_notop.h5',
                                     VGG16_WEIGHTS_PATH_NO_TOP,
                                     cache_dir="./models")
     
@@ -117,7 +119,7 @@ def VGG16(include_top=True, weights='vggface', input_tensor=None, input_shape=No
     return model
 
 
-def VGG19(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=2622, weights_file=None):
+def VGG19(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000, weights_file=None):
 
     WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg19_weights_tf_dim_ordering_tf_kernels.h5'
     NONE_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5'

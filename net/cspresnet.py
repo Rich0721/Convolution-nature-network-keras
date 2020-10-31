@@ -5,14 +5,14 @@ Author: Rich, wu
 import os
 
 import tensorflow as tf
-from tensorflow.python.keras.models import Model
-from tensorflow.python.keras import layers
-from tensorflow.python.keras.layers import Input, BatchNormalization, Reshape
-from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
-from tensorflow.python.keras.layers import GlobalAveragePooling2D, AveragePooling2D, GlobalMaxPooling2D, LeakyReLU
-from tensorflow.python.keras.engine import get_source_inputs
-from tensorflow.python.keras.utils import get_file, layer_utils
+from keras.models import Model
+from keras import layers
+from keras.layers import Input, BatchNormalization, Reshape
+from keras import backend as K
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
+from keras.layers import GlobalAveragePooling2D, AveragePooling2D, GlobalMaxPooling2D, LeakyReLU
+from keras.engine import get_source_inputs
+from keras.utils import get_file, layer_utils
 from keras_applications.imagenet_utils import _obtain_input_shape
 import warnings
 

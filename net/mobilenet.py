@@ -3,14 +3,14 @@ Author: Rich, wu
 '''
 
 import tensorflow as tf
-from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.models import Model
-from tensorflow.python.keras.layers import Input, BatchNormalization
-from tensorflow.python.keras.layers import Conv2D, DepthwiseConv2D, ReLU
-from tensorflow.python.keras.layers import AveragePooling2D, Flatten, Dense, add
-from tensorflow.python.keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D
-from tensorflow.python.keras.engine import get_source_inputs
-from tensorflow.python.keras.utils import layer_utils, get_file
+from keras import backend as K
+from keras.models import Model
+from keras.layers import Input, BatchNormalization
+from keras.layers import Conv2D, DepthwiseConv2D, ReLU
+from keras.layers import AveragePooling2D, Flatten, Dense, add
+from keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D
+from keras.engine import get_source_inputs
+from keras.utils import layer_utils, get_file
 from keras_applications.imagenet_utils import _obtain_input_shape
 import warnings
 

@@ -5,14 +5,14 @@ Author: Rich, wu
 import os
 
 import tensorflow as tf
-from tensorflow.python.keras.models import Model
-from tensorflow.python.keras.layers import Input, BatchNormalization, Reshape
-from tensorflow.python.keras import layers
-from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Activation
-from tensorflow.python.keras.layers import GlobalAveragePooling2D, AveragePooling2D, GlobalMaxPooling2D
-from tensorflow.python.keras.engine import get_source_inputs
-from tensorflow.python.keras.utils import get_file, layer_utils
+from keras.models import Model
+from keras.layers import Input, BatchNormalization, Reshape
+from keras import layers
+from keras import backend as K
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Activation
+from keras.layers import GlobalAveragePooling2D, AveragePooling2D, GlobalMaxPooling2D
+from keras.engine import get_source_inputs
+from keras.utils import get_file, layer_utils
 from keras_applications.imagenet_utils import _obtain_input_shape
 import warnings
 
@@ -77,12 +77,12 @@ def resnet_conv_block(input_tensor, kernel_size, filters, stage, block, strides=
     return x
 
 
-def resnet50(include_top=True, weights='vggface', input_tensor=None, input_shape=None,
-            pooling=None, classes=8631):
+def resnet50(include_top=True, weights='imagenet', input_tensor=None, input_shape=None,
+            pooling=None, classes=1000):
     
 
-    RESNET50_WEIGHTS_PATH = 'https://github.com/rcmalli/keras-vggface/releases/download/v2.0/rcmalli_vggface_tf_resnet50.h5'
-    RESNET50_WEIGHTS_PATH_NO_TOP = 'https://github.com/rcmalli/keras-vggface/releases/download/v2.0/rcmalli_vggface_tf_notop_resnet50.h5'
+    RESNET50_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
+    RESNET50_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
 
     input_shape = _obtain_input_shape(input_shape, 
                                     default_size=224,
@@ -147,13 +147,14 @@ def resnet50(include_top=True, weights='vggface', input_tensor=None, input_shape
     
     model = Model(inputs, x, name='vggface_resnet50')
     model.summary()
-    if weights == 'vggface':
+    
+    if weights == 'imagenet':
         if include_top:
-            weights_path = get_file('rcmalli_vggface_tf_resnet50.h5',
+            weights_path = get_file('resnet50_weights_tf_dim_ordering_tf_kernels.h5',
                                     RESNET50_WEIGHTS_PATH,
                                     cache_subdir='./models')
         else:
-            weights_path = get_file('rcmalli_vggface_tf_notop_resnet50.h5',
+            weights_path = get_file('resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
                                      RESNET50_WEIGHTS_PATH_NO_TOP,
                                     cache_dir="./models")
         
@@ -181,6 +182,8 @@ def resnet50(include_top=True, weights='vggface', input_tensor=None, input_shape
     
     
     return model
+
+
 
 def resnet101(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000):
 
