@@ -1,19 +1,45 @@
+# Convolution-neture-network-keras
+Sort out all CNN network can use train and test.
+Use keras(2.4.3) and Tensorflow-gpu(2.2.0)
 
-<div>
-<h1>Convolution-neture-network-keras</h1>
-<p>Sort out all CNN network can use train and test</p>
-</div>
+## Todo
+- [x] VGGnet
+- [x] Resnet
+- [x] Xception
+- [x] CSPNet
+- [x] mobileNet v1
+- [x] mobileNet v2
 
-<div>
-<p>train.py : The file is train CNN network</p>
-<p>test.py: The file is test CNN network</p>
-</div>
+## Install library
+```
+pip install requirments.txt
+```
 
-<div>
-<p><h2>CNN network reference paper</h2></p>
-<p><a href="https://arxiv.org/abs/1409.1556">Very Deep Convolutional Networks for Large-Scale Image Recognition</a></p>
-<p><a href="https://arxiv.org/abs/1512.03385">Deep Residual Learning for Image Recognition</a></p>
-<p><a href="https://arxiv.org/abs/1704.04861">MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications</a></p> 
-<p><a href="https://arxiv.org/abs/1801.04381">MobileNetV2: Inverted Residuals and Linear Bottlenecks</a></p> 
-<p><a href="https://arxiv.org/abs/1911.11929">CSPNet: A New Backbone that can Enhance Learning Capability of CNN</a></p> 
-</div>
+## Inference
+You can construct three folders - train, val, and test, respectively.
+And then you want to training categories folder put in these folders.
+
+-train
+  -dog
+  -cat
+-val
+  -dog
+  -cat
+-test
+  -dog
+  -cat  
+
+```
+python train.py
+```
+```
+python test.py
+```
+
+## Reference Paper
+[VGGNet](https://arxiv.org/abs/1409.1556)
+[ResNet](https://arxiv.org/abs/1512.03385)
+[MobileNets](https://arxiv.org/abs/1704.04861)
+[MobileNets v2](https://arxiv.org/abs/1801.04381)
+[CSPNet](https://arxiv.org/abs/1911.11929)
+[Xception](https://arxiv.org/abs/1610.02357)
