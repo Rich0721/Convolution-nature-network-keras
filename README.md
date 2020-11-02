@@ -37,9 +37,9 @@ python test.py
 ```
 
 ## Reference Paper
-[VGGNet](https://arxiv.org/abs/1409.1556)
-[ResNet](https://arxiv.org/abs/1512.03385)
-[MobileNets](https://arxiv.org/abs/1704.04861)
-[MobileNets v2](https://arxiv.org/abs/1801.04381)
-[CSPNet](https://arxiv.org/abs/1911.11929)
-[Xception](https://arxiv.org/abs/1610.02357)
+[VGGNet](https://arxiv.org/abs/1409.1556)\n
+[ResNet](https://arxiv.org/abs/1512.03385)\n
+[MobileNets](https://arxiv.org/abs/1704.04861)\n
+[MobileNets v2](https://arxiv.org/abs/1801.04381)\n
+[CSPNet](https://arxiv.org/abs/1911.11929)\n
+[Xception](https://arxiv.org/abs/1610.02357)\n
