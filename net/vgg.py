@@ -10,6 +10,7 @@ from keras.layers import Input, BatchNormalization, Reshape
 from keras import backend as K
 from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
 from keras.layers import GlobalAveragePooling2D, AveragePooling2D, GlobalMaxPooling2D
+from keras.regularizers import l2
 from keras.engine import get_source_inputs
 from keras.utils import get_file, layer_utils
 from keras_applications.imagenet_utils import _obtain_input_shape
@@ -19,7 +20,7 @@ import warnings
 
 
 
-def VGG16(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000, weights_file=None):
+def VGG16(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000, weights_file=None, l2_norm=5e-4):
 
     VGG16_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_th_dim_ordering_th_kernels.h5'
     VGG16_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_th_dim_ordering_th_kernels_notop.h5'
@@ -35,31 +36,31 @@ def VGG16(include_top=True, weights='imagenet', input_tensor=None, input_shape=N
             img_input = input_tensor
     
     # Block1
-    x = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv1_1')(img_input)
-    x = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv1_2')(x)
+    x = Conv2D(64, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv1_1')(img_input)
+    x = Conv2D(64, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv1_2')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool1')(x)
 
     # Block2
-    x = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv2_1')(x)
-    x = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv2_2')(x)
+    x = Conv2D(128, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv2_1')(x)
+    x = Conv2D(128, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv2_2')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool2')(x)
 
     # Block3
-    x = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_1')(x)
-    x = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_2')(x)
-    x = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_3')(x)
+    x = Conv2D(256, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv3_1')(x)
+    x = Conv2D(256, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv3_2')(x)
+    x = Conv2D(256, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv3_3')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool3')(x)
 
     # Block4
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_1')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_2')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_3')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv4_1')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv4_2')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv4_3')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool4')(x)
 
     # Block5
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_1')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_2')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_3')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv5_1')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv5_2')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv5_3')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool5')(x)
 
     if include_top:
@@ -119,7 +120,7 @@ def VGG16(include_top=True, weights='imagenet', input_tensor=None, input_shape=N
     return model
 
 
-def VGG19(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000, weights_file=None):
+def VGG19(include_top=True, weights='imagenet', input_tensor=None, input_shape=None, pooling=None, classes=1000, weights_file=None, l2_norm=5e-4):
 
     WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg19_weights_tf_dim_ordering_tf_kernels.h5'
     NONE_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5'
@@ -135,34 +136,34 @@ def VGG19(include_top=True, weights='imagenet', input_tensor=None, input_shape=N
             img_input = input_tensor
     
     # Block1
-    x = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv1_1')(img_input)
-    x = Conv2D(64, (3, 3), activation='relu', padding='same', name='conv1_2')(x)
+    x = Conv2D(64, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv1_1')(img_input)
+    x = Conv2D(64, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv1_2')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool1')(x)
 
     # Block2
-    x = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv2_1')(x)
-    x = Conv2D(128, (3, 3), activation='relu', padding='same', name='conv2_2')(x)
+    x = Conv2D(128, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv2_1')(x)
+    x = Conv2D(128, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv2_2')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool2')(x)
 
     # Block3
-    x = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_1')(x)
-    x = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_2')(x)
-    x = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_3')(x)
-    x = Conv2D(256, (3, 3), activation='relu', padding='same', name='conv3_4')(x)
+    x = Conv2D(256, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv3_1')(x)
+    x = Conv2D(256, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv3_2')(x)
+    x = Conv2D(256, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv3_3')(x)
+    x = Conv2D(256, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv3_4')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool3')(x)
 
     # Block4
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_1')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_2')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_3')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv4_4')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv4_1')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv4_2')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv4_3')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv4_4')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool4')(x)
 
     # Block5
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_1')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_2')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_3')(x)
-    x = Conv2D(512, (3, 3), activation='relu', padding='same', name='conv5_4')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv5_1')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv5_2')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv5_3')(x)
+    x = Conv2D(512, (3, 3), activation='relu', padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv5_4')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2), name='pool5')(x)
 
     if include_top:

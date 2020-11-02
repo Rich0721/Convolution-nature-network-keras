@@ -9,6 +9,7 @@ from tensorflow.python.keras.layers import Input, BatchNormalization
 from tensorflow.python.keras.layers import Conv2D, SeparableConv2D, Activation
 from tensorflow.python.keras.layers import AveragePooling2D, Flatten, Dense, add
 from tensorflow.python.keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D, MaxPooling2D
+from keras.regularizers import l2
 from tensorflow.python.keras.engine import get_source_inputs
 from tensorflow.python.keras.utils import layer_utils, get_file
 from keras_applications.imagenet_utils import _obtain_input_shape
@@ -19,15 +20,15 @@ def residual_separable(inputs, filters, block, use_bias=False, bn_axis=-1):
     residual_name = "conv" + str(block) +  "_residual"
     sparable_name = "conv" + str(block) + "_separable"
 
-    residual = Conv2D(filters[0], (1, 1), strides=(2, 2), padding='same', use_bias=use_bias, name=residual_name)(inputs)
+    residual = Conv2D(filters[0], (1, 1), strides=(2, 2), padding='same', use_bias=use_bias, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name=residual_name)(inputs)
     residual = BatchNormalization(axis=bn_axis, name=residual_name + "_bn")(residual)
     
     if block != 2:
         inputs = Activation('relu')(inputs)
-    x = SeparableConv2D(filters[1], (3, 3), padding='same', use_bias=use_bias, name=sparable_name + "1")(inputs)
+    x = SeparableConv2D(filters[1], (3, 3), padding='same', use_bias=use_bias, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name=sparable_name + "1")(inputs)
     x = BatchNormalization(axis=bn_axis, name=sparable_name + "1_bn")(x)
     x = Activation('relu')(x)
-    x = SeparableConv2D(filters[2], (3, 3), padding='same', use_bias=use_bias, name=sparable_name + "2")(x)
+    x = SeparableConv2D(filters[2], (3, 3), padding='same', use_bias=use_bias, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name=sparable_name + "2")(x)
     x = BatchNormalization(axis=bn_axis, name=sparable_name + "2_bn")(x)
 
     # Pool
@@ -42,13 +43,13 @@ def middle_flow(inputs, filters, block, use_bias=False, bn_axis=-1):
     residual = inputs
 
     x = Activation('relu')(inputs)
-    x = SeparableConv2D(filters, (3, 3), padding='same', use_bias=use_bias, name=sparable_name + "1")(x)
+    x = SeparableConv2D(filters, (3, 3), padding='same', use_bias=use_bias, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm),  name=sparable_name + "1")(x)
     x = BatchNormalization(axis=bn_axis, name=sparable_name + "1_bn")(x)
     x = Activation('relu')(x)
-    x = SeparableConv2D(filters, (3, 3), padding='same', use_bias=use_bias, name=sparable_name + "2")(x)
+    x = SeparableConv2D(filters, (3, 3), padding='same', use_bias=use_bias, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm),  name=sparable_name + "2")(x)
     x = BatchNormalization(axis=bn_axis, name=sparable_name + "2_bn")(x)
     x = Activation('relu')(x)
-    x = SeparableConv2D(filters, (3, 3), padding='same', use_bias=use_bias, name=sparable_name + "3")(x)
+    x = SeparableConv2D(filters, (3, 3), padding='same', use_bias=use_bias, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name=sparable_name + "3")(x)
     x = BatchNormalization(axis=bn_axis, name=sparable_name + "2_bn")(x)
 
     x = add([x, residual])
@@ -79,10 +80,10 @@ def xception(include_top=True, weights="imagenet", input_tensor=None, input_shap
     
 
     # Block 1
-    x = Conv2D(32, (3, 3), strides=(2, 2), use_bias=False, name="conv1_1")(img_input)
+    x = Conv2D(32, (3, 3), strides=(2, 2), use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name="conv1_1")(img_input)
     x = BatchNormalization(axis=bn_axis, name="conv1_1_bn")(x)
     x = Activation('relu')(x)
-    x = Conv2D(64, (3, 3), use_bias=False, name="conv1_2")(x)
+    x = Conv2D(64, (3, 3), use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name="conv1_2")(x)
     x = BatchNormalization(axis=bn_axis, name="conv1_2_bn")(x)
     x = Activation('relu')(x)
 
@@ -104,10 +105,10 @@ def xception(include_top=True, weights="imagenet", input_tensor=None, input_shap
 
     # Block14
     
-    x = SeparableConv2D(1536, (3, 3), padding='same', use_bias=False, name= "conv14_1")(x)
+    x = SeparableConv2D(1536, (3, 3), padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name= "conv14_1")(x)
     x = BatchNormalization(axis=bn_axis, name="conv14_1_bn")(x)
     x = Activation('relu')(x)
-    x = SeparableConv2D(2048, (3, 3), padding='same', use_bias=False, name="conv14_2")(x)
+    x = SeparableConv2D(2048, (3, 3), padding='same', use_bias=False, kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name="conv14_2")(x)
     x = BatchNormalization(axis=bn_axis, name="conv14_2_bn")(x)
     x = Activation('relu', name="pool5")(x)
 

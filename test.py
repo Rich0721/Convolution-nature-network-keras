@@ -42,7 +42,7 @@ class Test(object):
                 img = cv2.imread(image)
                 img = cv2.resize(img, (224, 224))
                 img = img[:, :, [2, 1, 0]]
-                img = img / 255
+                #img = img / 255.
                 img = np.expand_dims(img, axis=0)
 
                 index = self._model.predict(img)
@@ -85,17 +85,18 @@ class Test(object):
         heat_map.xaxis.set_ticks_position("bottom")
         heat_map.set_ylim(len(self._nb_classes), 0)
         plt.title("Confusion matrix : {}".format(title))
-        plt.xlabel("Predicted Tree", labelpad=10)
-        plt.ylabel("True Tree", labelpad=10)
+        plt.xlabel("Predicted", labelpad=10)
+        plt.ylabel("True", labelpad=10)
         plt.savefig(os.path.join("./confusion", title + ".jpg"))
 
 
 if __name__ == "__main__":
     K.clear_session()
     
-    test = Test(test_folder="../datasets/crop/test", model_file='./models/resnet50.hdf5')
+    test = Test(test_folder="./MASK/test", model_file='./models/vgg19.h5')
     
     test.verification()
     
-    test.confusionMatrix(title="resnet")
-    accuracy['resnet']  = test.printResult()
+    test.confusionMatrix(title="vgg19")
+    print(test.printResult())
+    #accuracy['resnet']  = test.printResult()

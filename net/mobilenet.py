@@ -9,13 +9,14 @@ from keras.layers import Input, BatchNormalization
 from keras.layers import Conv2D, DepthwiseConv2D, ReLU
 from keras.layers import AveragePooling2D, Flatten, Dense, add
 from keras.layers import GlobalAveragePooling2D, GlobalMaxPooling2D
+from keras.regularizers import l2
 from keras.engine import get_source_inputs
 from keras.utils import layer_utils, get_file
 from keras_applications.imagenet_utils import _obtain_input_shape
 import warnings
 
 # mobilenet version 1
-def _depthwise_separable_Conv(inputs, filters, block, bn_axis, alpha=1.0, use_bias=False, strides=(1, 1)):
+def _depthwise_separable_Conv(inputs, filters, block, bn_axis, alpha=1.0, use_bias=False, strides=(1, 1), l2_norm=5e-4):
 
     depth = "conv" + str(block) + "_" + "depth"
     width = "conv" + str(block) + "_" + "width"

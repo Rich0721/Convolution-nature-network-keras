@@ -6,17 +6,18 @@ import os
 
 import tensorflow as tf
 from keras.models import Model
-from keras.layers import Input, BatchNormalization, Reshape
+from keras.layers import Input, BatchNormalization, Reshape, ZeroPadding2D
 from keras import layers
 from keras import backend as K
 from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Activation
 from keras.layers import GlobalAveragePooling2D, AveragePooling2D, GlobalMaxPooling2D
+from keras.regularizers import l2
 from keras.engine import get_source_inputs
 from keras.utils import get_file, layer_utils
 from keras_applications.imagenet_utils import _obtain_input_shape
 import warnings
 
-def resnet_identity_block(input_tensor, kernel_size, filters, stage, block, bias=False):
+def resnet_identity_block(input_tensor, kernel_size, filters, stage, block, bias=False, l2_norm=5e-4):
 
     filter1, filter2, filter3 = filters
 
@@ -29,22 +30,25 @@ def resnet_identity_block(input_tensor, kernel_size, filters, stage, block, bias
     conv1_increase_name = 'conv' + str(stage) + "_" + str(block) + "_1x1_increase"
     conv3_name = "conv" + str(stage) + "_" + str(block) + "_3x3"
 
-    x = Conv2D(filter1, (1, 1), use_bias=bias, name=conv1_reduce_name)(input_tensor)
+    x = Conv2D(filter1, (1, 1), use_bias=bias, name=conv1_reduce_name,
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm))(input_tensor)
     x = BatchNormalization(axis=bn_axis, name=conv1_reduce_name+"/bn")(x)
     x = Activation('relu')(x)
 
-    x = Conv2D(filter2, kernel_size, use_bias=bias, padding='same', name=conv3_name)(x)
+    x = Conv2D(filter2, kernel_size, use_bias=bias, padding='same', name=conv3_name,
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm))(x)
     x = BatchNormalization(axis=bn_axis, name=conv3_name+"/bn")(x)
     x = Activation('relu')(x)
 
-    x = Conv2D(filter3, (1, 1), use_bias=bias, name=conv1_increase_name)(x)
+    x = Conv2D(filter3, (1, 1), use_bias=bias, name=conv1_increase_name,
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm))(x)
     x = BatchNormalization(axis=bn_axis, name=conv1_increase_name + "/bn")(x)
 
     x = layers.add([x, input_tensor])
     x = Activation('relu')(x)
     return x
 
-def resnet_conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2), bias=False):
+def resnet_conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2), bias=False, l2_norm=5e-4):
 
     filter1, filter2, filter3 = filters
 
@@ -58,18 +62,22 @@ def resnet_conv_block(input_tensor, kernel_size, filters, stage, block, strides=
     conv1_proj_name = "conv" + str(stage) + "_" + str(block) + "_1x1_proj"
     conv3_name = "conv" + str(stage) + "_" + str(block) + "_3x3"
 
-    x = Conv2D(filter1, (1, 1), strides=strides, use_bias=bias, name=conv1_reduce_name)(input_tensor)
+    x = Conv2D(filter1, (1, 1), strides=strides, use_bias=bias, name=conv1_reduce_name,
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm))(input_tensor)
     x = BatchNormalization(axis=bn_axis, name=conv1_reduce_name + "/bn")(x)
     x = Activation('relu')(x)
 
-    x = Conv2D(filter2, kernel_size, padding='same', use_bias=bias, name=conv3_name)(x)
+    x = Conv2D(filter2, kernel_size, padding='same', use_bias=bias, name=conv3_name,
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm))(x)
     x = BatchNormalization(axis=bn_axis, name=conv3_name + "/bn")(x)
     x = Activation('relu')(x)
 
-    x = Conv2D(filter3, (1, 1), name=conv1_increase_name, use_bias=bias)(x)
+    x = Conv2D(filter3, (1, 1), name=conv1_increase_name, use_bias=bias,
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm))(x)
     x = BatchNormalization(axis=bn_axis, name=conv1_increase_name+"/bn")(x)
 
-    shortcut = Conv2D(filter3, (1, 1), strides=strides, use_bias=bias, name=conv1_proj_name)(input_tensor)
+    shortcut = Conv2D(filter3, (1, 1), strides=strides, use_bias=bias, 
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name=conv1_proj_name)(input_tensor)
     shortcut = BatchNormalization(axis=bn_axis, name=conv1_proj_name + "/bn")(shortcut)
 
     x = layers.add([x, shortcut])
@@ -77,12 +85,12 @@ def resnet_conv_block(input_tensor, kernel_size, filters, stage, block, strides=
     return x
 
 
-def resnet50(include_top=True, weights='imagenet', input_tensor=None, input_shape=None,
-            pooling=None, classes=1000):
+def resnet50(include_top=True, weights='vggface', input_tensor=None, input_shape=None,
+            pooling=None, classes=1000, l2_norm=5e-4):
     
 
     RESNET50_WEIGHTS_PATH = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels.h5'
-    RESNET50_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
+    RESNET50_WEIGHTS_PATH_NO_TOP = 'https://github.com/rcmalli/keras-vggface/releases/download/v2.0/rcmalli_vggface_tf_notop_resnet50.h5'
 
     input_shape = _obtain_input_shape(input_shape, 
                                     default_size=224,
@@ -104,8 +112,10 @@ def resnet50(include_top=True, weights='imagenet', input_tensor=None, input_shap
     else:
         bn_axis = 1
     
-    x = Conv2D(64, (7, 7), use_bias=False, strides=(2, 2), padding='same', name='conv1/7x7_s2')(img_input)
-    x = BatchNormalization(axis=bn_axis, name='conv1/7x7_s2/bn')(x)
+    #x = ZeroPadding2D((3, 3))(img_input)
+    x = Conv2D(64, (7, 7), strides=(2, 2),use_bias=False, padding='same',
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv1/7x7_s2')(img_input)
+    x = BatchNormalization(axis=bn_axis, name='conv1/7x7_s2_bn')(x)
     x = Activation('relu')(x)
     x = MaxPooling2D((3, 3), strides=(2, 2))(x)
 
@@ -146,39 +156,38 @@ def resnet50(include_top=True, weights='imagenet', input_tensor=None, input_shap
         inputs = img_input
     
     model = Model(inputs, x, name='vggface_resnet50')
-    model.summary()
-    
-    if weights == 'imagenet':
+    #model.summary()
+    '''
+    if weights == 'vggface':
         if include_top:
             weights_path = get_file('resnet50_weights_tf_dim_ordering_tf_kernels.h5',
                                     RESNET50_WEIGHTS_PATH,
                                     cache_subdir='./models')
         else:
-            weights_path = get_file('resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
+            weights_path = get_file('rcmalli_vggface_tf_notop_resnet50.h5',
                                      RESNET50_WEIGHTS_PATH_NO_TOP,
                                     cache_dir="./models")
+    
+    model.load_weights(weights_path)
+    '''
+    if K.backend() == "theano":
+        layer_utils.convert_all_kernels_in_model(model)
+        if include_top:
+            maxpool = model.get_layer(name='avg_pool')
+            shape = maxpool.output_shape[1:]
+            dense = model.get_layer(name='classifier')
+            layer_utils.convert_dense_weights_data_format(dense, shape, 'channels_first')
         
-        model.load_weights(weights_path)
+    if K.image_data_format() == "channels_first" and K.backend() == 'tensorflow':
+        warnings.warn('You are using the TensorFlow backend, yet you '
+                        'are using the Theano '
+                        'image data format convention '
+                        '(`image_data_format="channels_first"`). '
+                        'For best performance, set '
+                        '`image_data_format="channels_last"` in '
+                        'your Keras config '
+                        'at ~/.keras/keras.json.')
 
-        if K.backend() == "theano":
-            layer_utils.convert_all_kernels_in_model(model)
-            if include_top:
-                maxpool = model.get_layer(name='avg_pool')
-                shape = maxpool.output_shape[1:]
-                dense = model.get_layer(name='classifier')
-                layer_utils.convert_dense_weights_data_format(dense, shape, 'channels_first')
-            
-        if K.image_data_format() == "channels_first" and K.backend() == 'tensorflow':
-            warnings.warn('You are using the TensorFlow backend, yet you '
-                          'are using the Theano '
-                          'image data format convention '
-                          '(`image_data_format="channels_first"`). '
-                          'For best performance, set '
-                          '`image_data_format="channels_last"` in '
-                          'your Keras config '
-                          'at ~/.keras/keras.json.')
-    elif weights is not None:
-        model.load_weights(weights)
     
     
     return model
@@ -209,7 +218,8 @@ def resnet101(include_top=True, weights='imagenet', input_tensor=None, input_sha
         bn_axis = 1
 
 
-    x = Conv2D(64, (7, 7), strides=(2, 2), padding='same', name='conv1/7*7')(img_input)
+    x = Conv2D(64, (7, 7), strides=(2, 2), padding='same',
+                kernel_initializer='he_normal', kernel_regularizer=l2(l2_norm), name='conv1/7*7')(img_input)
     x = BatchNormalization(axis=bn_axis, name='conv1/7*7/bn')(x)
     x = Activation('relu')(x)
     x = MaxPooling2D((3, 3), strides=(2, 2))(x)
