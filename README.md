@@ -32,6 +32,7 @@ python test.py
 
 ## Reference Paper
 [VGGNet](https://arxiv.org/abs/1409.1556)
+
 [ResNet](https://arxiv.org/abs/1512.03385)
 
 [MobileNets](https://arxiv.org/abs/1704.04861)
