@@ -18,16 +18,10 @@ pip install requirments.txt
 ## Inference
 You can construct three folders - train, val, and test, respectively.
 And then you want to training categories folder put in these folders.
-
--train
-  -dog
-  -cat
--val
-  -dog
-  -cat
--test
-  -dog
-  -cat  
+For example
+-train(dog, cat)
+-test(dog, cat)
+-val(dog, cat)
 
 ```
 python train.py
